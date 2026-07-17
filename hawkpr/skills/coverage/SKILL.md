@@ -1,6 +1,6 @@
 ---
 name: coverage
-description: Track and check third-party news coverage of a pitched press release — the single entry point for all coverage actions. Use when the user says things like "/coverage", "track coverage for this press release", "start monitoring coverage for <brand>", "any new coverage for <brand>?", "check coverage", "what coverage has <brand> got", "send me a sample coverage email", or pastes a press release and asks to watch for pickup. Handles setup, on-demand checks, listing campaigns, editing tracked queries, and sample emails — no web UI needed.
+description: Track and check third-party news coverage of a pitched press release — the single entry point for all coverage actions. Use when the user says things like "/coverage", "track coverage for this press release", "start monitoring coverage for a brand", "any new coverage for a brand", "check coverage", "check coverage for a brand", "send me a sample coverage email", or pastes a press release and asks to watch for pickup. Handles setup, on-demand checks, listing campaigns, editing tracked queries, and sample emails — no web UI needed.
 ---
 
 # Coverage
