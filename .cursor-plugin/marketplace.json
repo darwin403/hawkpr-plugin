@@ -1,0 +1,24 @@
+{
+  "name": "hawkpr-plugin",
+  "owner": {
+    "name": "StudioHawk",
+    "email": "skdcodes@gmail.com"
+  },
+  "metadata": {
+    "version": "0.1.1",
+    "description": "HawkPR — plugin for digital PR workflows, powered by the HawkPR toolkit."
+  },
+  "plugins": [
+    {
+      "name": "hawkpr",
+      "source": "./hawkpr",
+      "description": "HawkPR digital PR toolkit: a consolidated set of DPR skills. Track third-party news coverage of a pitched press release end to end — create a campaign, run the hunt, confirm the tracked queries, preview the alert email, and get a shareable URL. More tools to come. No web UI required.",
+      "version": "0.1.1",
+      "author": {
+        "name": "StudioHawk"
+      },
+      "category": "productivity",
+      "keywords": ["digital-pr", "coverage", "media-monitoring", "hawkpr", "studiohawk", "automation"]
+    }
+  ]
+}

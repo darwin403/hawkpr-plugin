@@ -1,18 +1,37 @@
 # HawkPR plugin
 
-A Claude Code marketplace for **HawkPR** — a suite of digital PR tools that run
-inside a Claude conversation, no web UI required. It ships a single plugin,
-`hawkpr`, a consolidated toolkit whose first skill is coverage tracking.
+A marketplace for **HawkPR** — a suite of digital PR tools that run inside your
+AI agent conversation, no web UI required. It ships a single plugin, `hawkpr`, a
+consolidated toolkit whose first skill is coverage tracking.
+
+Works with **Claude Code** and **Cursor**.
 
 ## Install
+
+### Claude Code
 
 ```
 /plugin marketplace add darwin403/hawkpr-plugin
 /plugin install hawkpr@hawkpr-plugin
 ```
 
-Then use it — e.g. `/coverage`, or just paste a press release and ask to track
-its coverage.
+### Cursor
+
+**From GitHub (team marketplace):** Dashboard → Plugins → Add Marketplace →
+`darwin403/hawkpr-plugin`, then enable the plugin in **Customize**.
+
+**Local dev:**
+
+```bash
+git clone https://github.com/darwin403/hawkpr-plugin.git
+ln -s "$(pwd)/hawkpr-plugin/hawkpr" ~/.cursor/plugins/local/hawkpr
+```
+
+Reload Cursor, then enable the **hawkpr** skill and MCP server in **Customize**.
+
+### Use it
+
+Paste a press release and ask to track its coverage, or invoke `/coverage`.
 
 ## What's inside
 
@@ -25,4 +44,4 @@ server (`https://hawkpr.vercel.app/api/mcp`). The server and app are maintained
 separately; this repo contains no application code or secrets.
 
 To point the plugin at a different backend (staging, local), set `HAWKPR_MCP_URL`
-in your environment before launching Claude.
+in your environment before launching Claude or Cursor.

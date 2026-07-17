@@ -41,9 +41,9 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    user the first scan runs in the background (a few minutes) and is resumable.
    Poll `get_campaign` every ~20–30s until `hasSavedQueries` is true (the sweep
    saved its winning queries); placements usually appear by then.
-4. **Summarize as an Artifact.** Call `get_campaign` + `list_placements`, then
-   render one self-contained HTML page (consult the `artifact-design` skill for
-   calibration) with, in order:
+4. **Summarize visually.** Call `get_campaign` + `list_placements`, then render
+   one self-contained HTML page — a Claude Artifact (consult the `artifact-design`
+   skill) or a Cursor Canvas — with, in order:
    1. **Tracked queries** (`searchQueries`) — labelled as what will be monitored.
       This is the alignment check.
    2. **Sample alert preview** — a compact rendering of the coverage-alert email
@@ -71,7 +71,8 @@ expensive sweep runs once; ongoing checks are cheap and scheduled.
    doesn't advance (cooldown), just report current placements — don't force it.
 4. **Report** — `list_placements`, then summarize: new vs. the snapshot, total,
    links vs. mentions, notable domains, and the `url`. For more than a couple of
-   new placements, render a compact Artifact table instead of a long chat list.
+   new placements, render a compact HTML table (Artifact or Canvas) instead of a
+   long chat list.
 
 ## C. List campaigns
 

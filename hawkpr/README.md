@@ -1,9 +1,9 @@
 # HawkPR plugin
 
-A suite of digital PR tools for Claude, delivered as a single plugin with one
-skill per tool. No web UI required. The plugin is a thin layer over the hosted
-HawkPR MCP server; heavy work (e.g. the coverage SERP sweep) runs asynchronously
-in the HawkPR backend.
+A suite of digital PR tools, delivered as a single plugin with one skill per
+tool. No web UI required. The plugin is a thin layer over the hosted HawkPR MCP
+server; heavy work (e.g. the coverage SERP sweep) runs asynchronously in the
+HawkPR backend.
 
 ## Skills
 
@@ -18,10 +18,10 @@ More DPR skills will be added to this plugin over time.
 
 ## MCP server
 
-`.mcp.json` registers one server, `hawkpr`, defaulting to the production endpoint
-`https://hawkpr.vercel.app/api/mcp`. Tools: `create_campaign`, `list_campaigns`,
-`get_campaign`, `list_placements`, `set_queries`, `send_sample_email`,
-`start_hunt`.
+`mcp.json` / `.mcp.json` registers one server, `hawkpr`, defaulting to the
+production endpoint `https://hawkpr.vercel.app/api/mcp`. Tools: `create_campaign`,
+`list_campaigns`, `get_campaign`, `list_placements`, `set_queries`,
+`send_sample_email`, `start_hunt`.
 
 Override the backend with `HAWKPR_MCP_URL` (e.g. `http://localhost:3000/api/mcp`
 for local development).
