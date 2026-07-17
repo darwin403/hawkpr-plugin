@@ -1,0 +1,11 @@
+{
+  "name": "hawkpr",
+  "version": "0.1.0",
+  "description": "HawkPR — a suite of digital PR tools for Claude. Track third-party news coverage of pitched press releases end to end (create a campaign, run the hunt, confirm the tracked queries, preview the alert email, get a shareable URL), with more DPR tools added as skills over time. No web UI required.",
+  "author": {
+    "name": "StudioHawk",
+    "email": "skdcodes@gmail.com"
+  },
+  "repository": "https://github.com/darwin403/hawkpr-plugins",
+  "keywords": ["digital-pr", "coverage", "media-monitoring", "hawkpr", "studiohawk", "automation"]
+}
