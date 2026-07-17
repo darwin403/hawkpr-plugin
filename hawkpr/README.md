@@ -8,11 +8,12 @@ HawkPR backend.
 ## Skills
 
 - **`/coverage`** — track third-party news coverage of a pitched press release.
-  Guided onboarding (create a campaign, run the initial hunt, confirm the tracked
-  queries, preview the alert email, hand off a shareable URL), plus on-demand
-  checks, listing, sample emails, and query edits. Routes all coverage actions
-  from one entry point; also triggers on natural language ("track coverage for
-  this press release", "any new coverage for <brand>?").
+  Guided onboarding (create a campaign, start the hunt, poll briefly until the
+  agent saves tracked queries, hand off a shareable URL while the sweep continues
+  in the background), plus on-demand checks, listing, sample emails, and query
+  edits. Routes all coverage actions from one entry point; also triggers on
+  natural language ("track coverage for this press release", "any new coverage
+  for <brand>?").
 
 More DPR skills will be added to this plugin over time.
 
@@ -23,9 +24,10 @@ production endpoint `https://hawkpr.vercel.app/api/mcp`. Tools: `create_campaign
 `list_campaigns`, `get_campaign`, `list_placements`, `set_queries`,
 `set_notification_emails`, `send_sample_email`, `start_hunt`.
 
-Campaign notification emails are stored per campaign at creation time (via
-`create_campaign`) and can be updated with `set_notification_emails`. When set,
-new confirmed placements trigger automatic Resend alerts.
+Campaign notification emails are an optional add-on, offered before handoff and
+configured via `set_notification_emails` (the plugin proposes the PR media
+contact with confirmation when present). When set, new confirmed placements
+trigger automatic Resend alerts.
 
 Override the backend with `HAWKPR_MCP_URL` (e.g. `http://localhost:3000/api/mcp`
 for local development).

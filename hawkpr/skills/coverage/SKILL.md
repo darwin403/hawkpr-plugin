@@ -11,8 +11,9 @@ Everything runs through the HawkPR MCP server (`hawkpr`): `create_campaign`,
 `set_notification_emails`, `send_sample_email`, `start_hunt`.
 
 The heavy SERP sweep + verification run asynchronously in the coverage agent;
-these tools are fast and deterministic. `start_hunt` returns immediately — poll
-`get_campaign` / `list_placements` for progress.
+these MCP tools are fast and deterministic. `start_hunt` returns immediately.
+During onboarding, poll `get_campaign` only until `searchQueries` is non-empty
+— do not wait for placements or sweep completion.
 
 ## Routing — pick the intent
 
@@ -32,55 +33,61 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
 ## A. Start tracking (new campaign onboarding)
 
 1. **Gather the pitch.** From the pasted press release extract `brandName`,
-   `brandDomain` (the brand's own site, e.g. `luxoliving.com.au`), a short `name`
-   (the pitch angle), and `pitchDate` (`YYYY-MM-DD`, when the pitch went out).
-   Confirm them back in one line. Never invent facts not in the pitch.
-2. **Notification email.** Ask which email address(es) should receive alerts when
-   new third-party coverage is confirmed. Default to the user's own email if known
-   from context. Comma-separated addresses are fine. If they skip, proceed without
-   notifications — say they'll need to add emails later via `set_notification_emails`.
-3. **Create** — call `create_campaign` with `notificationEmails` when provided;
-   keep `campaignId`, `slug`, `url`. If `existed` is true, say you're resuming
-   rather than duplicating.
-4. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; tell the
-   user the first scan runs in the background (a few minutes) and is resumable.
-   Poll `get_campaign` every ~20–30s until `hasSavedQueries` is true (the sweep
-   saved its winning queries); placements usually appear by then.
-5. **Summarize in markdown.** Call `get_campaign` + `list_placements`, then render
-   a structured markdown report in chat with, in order:
-   1. **Tracked queries** (`searchQueries`) — bullet list; labelled as what will be
-      monitored. This is the alignment check.
-   2. **Sample alert preview** — a compact markdown table or list of the
-      coverage-alert fields from found placements (title, domain, author, link type).
-   3. **What was found** — placement count, links vs. mentions, `lastCheckedAt`,
-      and `nextCheckAt`.
-   4. A prominent **[Open campaign](url)** link.
-6. **Confirm & hand off.** Ask the user to confirm or edit the tracked queries
-   (→ **E** if they change them). If notifications are enabled (`notificationsEnabled`),
-   confirm the alert address(es) and offer a sample email to those same addresses
-   (→ **D**, omit `to` to use the stored emails). Restate that tracking is live and
-   scheduled — new coverage is found automatically and emailed — and give the `url`.
+   `brandDomain` (the brand's own site, e.g. `luxoliving.com.au`), and `name`
+   (a **concise campaign title** — 3–8 words, derived from the release headline
+   or dek; crisp and recognizable, not a long thematic angle). If a media contact
+   email appears in the footer or contact block (`Media contact`, `For media
+   enquiries`, `Press contact`), note it for step 5 but do not act on it yet.
+   Confirm brand, domain, and campaign name in one line. Never invent facts not in
+   the pitch. Do **not** extract or confirm a pitch date.
+2. **Create** — call `create_campaign` with `brandName`, `brandDomain`, `name`,
+   and `pressRelease` only (omit `notificationEmails`); keep `campaignId`, `slug`,
+   `url`. If `existed` is true, say you're resuming rather than duplicating.
+3. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; the
+   agent generates tracked queries and runs the first scan in the background.
+4. **Wait for queries only.** Poll `get_campaign` every ~10–15s until
+   `searchQueries` is non-empty (or `hasSavedQueries` is true). Skip polling if
+   the campaign already has queries (e.g. `existed: true`). If queries still have
+   not appeared after ~2–3 minutes, proceed to step 5 anyway (queries may still
+   be generating).
+5. **Offer email alerts (optional, before handoff).** Always ask before step 6
+   unless resuming a campaign that already has `notificationEmails` set. Use
+   `AskQuestion` — not trailing prose — with prompt *"Want automatic emails when
+   new coverage is confirmed?"*
+   - **PR has media contact:** include an option to use `{email}` from the release;
+     accept confirm, substitute, comma-separated addresses, or decline.
+   - **No media contact:** yes/no; if yes, ask which address(es).
+   - On yes → `set_notification_emails(campaignId, emails)`. On no → leave off.
+6. **Hand off in markdown** (do not wait for placements or `lastSweptAt`):
+   1. **Tracked queries** — bullet list from `searchQueries` (agent-generated).
+      Note the sweep may refine this list when it finishes.
+   2. **Status** — campaign name (`name`), brand (`brandName`), tracked since
+      (`createdAt`), notifications (off, or list `notificationEmails` if set in
+      step 5); first scan continues in the background.
+   3. A prominent **[Open campaign](url)** link.
 
-Do not skip the query confirmation in step 6; it is the alignment moment. The
-expensive sweep runs once; ongoing checks are cheap and scheduled.
+   Open with one line: *Tracking **{name}** for **{brandName}** (`{brandDomain}`).*
+   Do not label or refer to the campaign as an "angle".
+7. **Other optional follow-ups:** query edits (→ **E**), sample email (→ **D**).
+
+The expensive sweep runs once; ongoing checks are cheap and scheduled.
 
 ## B. Check a campaign (on-demand)
 
 1. **Resolve.** If the user gave a slug or URL, use it. Otherwise call
-   `list_campaigns` with `search` set to the brand/angle. Several matches → ask
+   `list_campaigns` with `search` set to the brand or campaign name. Several matches → ask
    which; none → there's no campaign yet, offer **A**.
-2. **Snapshot** — `get_campaign`; note placement count and `lastCheckedAt`.
-3. **Incremental check** — call `start_hunt` with `campaignId` (it enforces its
-   own cooldown, so just call it). It returns immediately; poll `get_campaign` a
-   few times to see if `lastCheckedAt` advances and the count grows. If state
-   doesn't advance (cooldown), just report current placements — don't force it.
-4. **Report** — `list_placements`, then summarize in markdown: new vs. the snapshot,
-   total, links vs. mentions, notable domains, and the `url`. For more than a couple
-   of new placements, use a markdown table instead of a long bullet list.
+2. **Snapshot** — `get_campaign` and `list_placements`; note placement count and
+   `lastCheckedAt`.
+3. **Trigger check** — call `start_hunt` with `campaignId` if the user wants a
+   fresh check. It returns immediately; do not poll for updated counts.
+4. **Report** — summarize the snapshot in markdown: total placements, links vs.
+   mentions, notable domains, and the `url`. Note the check runs in the background
+   if you just triggered one.
 
 ## C. List campaigns
 
-Call `list_campaigns` (optionally with `search`). Show brand, angle, placement
+Call `list_campaigns` (optionally with `search`). Show brand, campaign name,
 status, last/next check, and each `url`. Offer to check one (**B**) or start a new
 one (**A**).
 
@@ -99,7 +106,15 @@ save). Confirm the new set — it's what ongoing checks will monitor.
 
 ## Notes
 
-- Everything is idempotent; re-running on the same brand + angle resumes the
+- **Campaign name:** short title from the release headline — e.g. *No safe threshold
+  sperm discovery*, not *No safe threshold — male fertility lifestyle impact*.
+  Never use "angle" in user-facing copy.
+- Notification emails are optional but ask via `AskQuestion` **before** the
+  handoff, not after. Configure with `set_notification_emails`, not at
+  `create_campaign`. Propose the PR media contact when present — never silently
+  use a client email or default to the user's own address. Skip when resuming
+  with notifications already set.
+- Everything is idempotent; re-running on the same brand + campaign name resumes the
   existing campaign rather than duplicating.
 - You never need to re-run `start_hunt` for routine monitoring — the schedule
   handles incremental checks. Use it only for the initial sweep (**A**) or an

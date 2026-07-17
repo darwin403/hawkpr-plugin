@@ -29,7 +29,8 @@ export HAWKPR_MCP_URL=http://localhost:3000/api/mcp
 npm run dev
 ```
 
-Reload Cursor/Claude, enable the **hawkpr** skill and MCP server.
+Reload Cursor. The script repoints Cursor's plugin registry to `plugin/hawkpr`
+and replaces the legacy `hawkpr-plugin/hawkpr` checkout path with a symlink.
 
 ## Publish
 
@@ -37,4 +38,4 @@ Reload Cursor/Claude, enable the **hawkpr** skill and MCP server.
 ./scripts/publish-plugin.sh
 ```
 
-Pushes `plugin/` to the public marketplace repo via `git subtree`.
+Pushes `plugin/` to the public marketplace repo (rsync + commit).
