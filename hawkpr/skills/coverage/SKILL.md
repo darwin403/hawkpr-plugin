@@ -44,33 +44,52 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    and `pressRelease` only (omit `notificationEmails`); keep `campaignId`, `slug`,
    `url`. If `existed` is true, say you're resuming rather than duplicating.
 3. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; the
-   agent generates tracked queries and runs the first scan in the background.
+   agent generates tracked queries and runs the initial scan in the background.
 4. **Wait for queries only.** Poll `get_campaign` every ~10–15s until
    `searchQueries` is non-empty (or `hasSavedQueries` is true). Skip polling if
    the campaign already has queries (e.g. `existed: true`). If queries still have
    not appeared after ~2–3 minutes, proceed to step 5 anyway (queries may still
    be generating).
-5. **Offer email alerts (optional, before handoff).** Always ask before step 6
-   unless resuming a campaign that already has `notificationEmails` set. Use
-   `AskQuestion` — not trailing prose — with prompt *"Want automatic emails when
-   new coverage is confirmed?"*
+5. **Hand off tracked queries** (do not wait for placements or `lastSweptAt`):
+   - Open with one line: *Tracking **{name}** for **{brandName}** (`{brandDomain}`).*
+   - **Tracked queries** — bullet list from `searchQueries` (agent-generated).
+     Note the sweep may refine this list when it finishes.
+   - Do not include Status yet. Do not label or refer to the campaign as an "angle".
+6. **Offer email alerts (optional).** Always ask unless resuming a campaign that
+   already has `notificationEmails` set. Use `AskQuestion` — not trailing prose —
+   with prompt *"Want automatic emails when new coverage is confirmed?"*
    - **PR has media contact:** include an option to use `{email}` from the release;
      accept confirm, substitute, comma-separated addresses, or decline.
    - **No media contact:** yes/no; if yes, ask which address(es).
    - On yes → `set_notification_emails(campaignId, emails)`. On no → leave off.
-6. **Hand off in markdown** (do not wait for placements or `lastSweptAt`):
-   1. **Tracked queries** — bullet list from `searchQueries` (agent-generated).
-      Note the sweep may refine this list when it finishes.
-   2. **Status** — campaign name (`name`), brand (`brandName`), tracked since
-      (`createdAt`), notifications (off, or list `notificationEmails` if set in
-      step 5); first scan continues in the background.
-   3. A prominent **[Open campaign](url)** link.
+   - If notifications already set, skip the question — one line in the status
+     handoff is enough (e.g. *Alerts go to `{email}` when new coverage is confirmed.*).
+7. **Status + link** — show a status table, then a prominent **[Open campaign](url)** link:
 
-   Open with one line: *Tracking **{name}** for **{brandName}** (`{brandDomain}`).*
-   Do not label or refer to the campaign as an "angle".
-7. **Other optional follow-ups:** query edits (→ **E**), sample email (→ **D**).
+   | | |
+   |---|---|
+   | **Campaign** | `{name}` |
+   | **Brand** | `{brandName}` |
+   | **Tracked since** | `{createdAt}` formatted |
+   | **Notifications** | Off, or comma-separated `notificationEmails` if set in step 6 |
+   | **Last scan** | Relative time from `lastCheckedAt`; if null → `In progress` |
+   | **Frequency** | Every 15 minutes |
 
-The expensive sweep runs once; ongoing checks are cheap and scheduled.
+   Never use "First scan", "Next scan", or "first scan in the background" in
+   user-facing copy.
+
+8. **Close with what happens next** — one short declarative line after the link.
+   No questions, no menu of optional next steps (do not ask about editing queries,
+   sample emails, or on-demand checks).
+
+   - Notifications on: *New coverage will show on the dashboard and email
+     `{notificationEmails}` automatically.*
+   - Notifications off: *New coverage will show on the dashboard — checks run
+     every 15 minutes.*
+
+   Setup is complete; the user can bookmark the link and leave it.
+
+The expensive sweep runs once; ongoing checks run every 15 minutes.
 
 ## B. Check a campaign (on-demand)
 
@@ -82,14 +101,15 @@ The expensive sweep runs once; ongoing checks are cheap and scheduled.
 3. **Trigger check** — call `start_hunt` with `campaignId` if the user wants a
    fresh check. It returns immediately; do not poll for updated counts.
 4. **Report** — summarize the snapshot in markdown: total placements, links vs.
-   mentions, notable domains, and the `url`. Note the check runs in the background
-   if you just triggered one.
+   mentions, notable domains, last scan (`lastCheckedAt` or `In progress`), frequency
+   (Every 15 minutes), and the `url`. Note the check runs in the background if you
+   just triggered one. Close declaratively — no optional-setup questions.
 
 ## C. List campaigns
 
 Call `list_campaigns` (optionally with `search`). Show brand, campaign name,
-status, last/next check, and each `url`. Offer to check one (**B**) or start a new
-one (**A**).
+last scan (`lastCheckedAt` or `In progress`), frequency (Every 15 minutes), and
+each `url`. Offer to check one (**B**) or start a new one (**A**).
 
 ## D. Sample email
 
@@ -109,13 +129,19 @@ save). Confirm the new set — it's what ongoing checks will monitor.
 - **Campaign name:** short title from the release headline — e.g. *No safe threshold
   sperm discovery*, not *No safe threshold — male fertility lifestyle impact*.
   Never use "angle" in user-facing copy.
-- Notification emails are optional but ask via `AskQuestion` **before** the
-  handoff, not after. Configure with `set_notification_emails`, not at
-  `create_campaign`. Propose the PR media contact when present — never silently
-  use a client email or default to the user's own address. Skip when resuming
-  with notifications already set.
+- Notification emails are optional. Ask via `AskQuestion` **after** showing tracked
+  queries and **before** the status table. Configure with `set_notification_emails`,
+  not at `create_campaign`. Propose the PR media contact when present — never silently
+  use a client email or default to the user's own address. Skip when resuming with
+  notifications already set.
+- **Scan status:** last scan from `lastCheckedAt` (relative time, or `In progress`
+  when null). Frequency is always **Every 15 minutes** — hardcoded, not computed.
+  Never say "First scan" or "Next scan".
+- **Handoff closing:** after onboarding or a check, state expected outcomes in one
+  line — never end with questions like "Want to edit queries, send a sample email, …?"
+  Optional actions (sections **D**, **E**) are only when the user asks.
 - Everything is idempotent; re-running on the same brand + campaign name resumes the
   existing campaign rather than duplicating.
-- You never need to re-run `start_hunt` for routine monitoring — the schedule
-  handles incremental checks. Use it only for the initial sweep (**A**) or an
+- You never need to re-run `start_hunt` for routine monitoring — checks run every
+  15 minutes automatically. Use it only for the initial sweep (**A**) or an
   explicit on-demand check (**B**).
