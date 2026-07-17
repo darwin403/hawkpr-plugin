@@ -8,7 +8,7 @@ description: Track and check third-party news coverage of a pitched press releas
 The single entry point for coverage tracking within the HawkPR toolkit.
 Everything runs through the HawkPR MCP server (`hawkpr`): `create_campaign`,
 `list_campaigns`, `get_campaign`, `list_placements`, `set_queries`,
-`send_sample_email`, `start_hunt`.
+`set_notification_emails`, `send_sample_email`, `start_hunt`.
 
 The heavy SERP sweep + verification run asynchronously in the coverage agent;
 these tools are fast and deterministic. `start_hunt` returns immediately — poll
@@ -35,13 +35,18 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    `brandDomain` (the brand's own site, e.g. `luxoliving.com.au`), a short `name`
    (the pitch angle), and `pitchDate` (`YYYY-MM-DD`, when the pitch went out).
    Confirm them back in one line. Never invent facts not in the pitch.
-2. **Create** — call `create_campaign`; keep `campaignId`, `slug`, `url`. If
-   `existed` is true, say you're resuming rather than duplicating.
-3. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; tell the
+2. **Notification email.** Ask which email address(es) should receive alerts when
+   new third-party coverage is confirmed. Default to the user's own email if known
+   from context. Comma-separated addresses are fine. If they skip, proceed without
+   notifications — say they'll need to add emails later via `set_notification_emails`.
+3. **Create** — call `create_campaign` with `notificationEmails` when provided;
+   keep `campaignId`, `slug`, `url`. If `existed` is true, say you're resuming
+   rather than duplicating.
+4. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; tell the
    user the first scan runs in the background (a few minutes) and is resumable.
    Poll `get_campaign` every ~20–30s until `hasSavedQueries` is true (the sweep
    saved its winning queries); placements usually appear by then.
-4. **Summarize visually.** Call `get_campaign` + `list_placements`, then render
+5. **Summarize visually.** Call `get_campaign` + `list_placements`, then render
    one self-contained HTML page — a Claude Artifact (consult the `artifact-design`
    skill) or a Cursor Canvas — with, in order:
    1. **Tracked queries** (`searchQueries`) — labelled as what will be monitored.
@@ -51,12 +56,13 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    3. **What was found** — placement count, links vs. mentions, `lastCheckedAt`,
       and `nextCheckAt`.
    4. A prominent **"Open campaign"** button linking to `url`.
-5. **Confirm & hand off.** Ask the user to confirm or edit the tracked queries
-   (→ **E** if they change them). Offer to send a real sample email (→ **D**).
-   Restate that tracking is live and scheduled — new coverage is found
-   automatically and emailed — and give the `url`.
+6. **Confirm & hand off.** Ask the user to confirm or edit the tracked queries
+   (→ **E** if they change them). If notifications are enabled (`notificationsEnabled`),
+   confirm the alert address(es) and offer a sample email to those same addresses
+   (→ **D**, omit `to` to use the stored emails). Restate that tracking is live and
+   scheduled — new coverage is found automatically and emailed — and give the `url`.
 
-Do not skip the query confirmation in step 5; it is the alignment moment. The
+Do not skip the query confirmation in step 6; it is the alignment moment. The
 expensive sweep runs once; ongoing checks are cheap and scheduled.
 
 ## B. Check a campaign (on-demand)
@@ -82,10 +88,10 @@ one (**A**).
 
 ## D. Sample email
 
-Resolve the campaign (as in **B.1**). Ask for the recipient address (default to
-the user's own if known), then call `send_sample_email` with `to`. It uses the
-campaign's real placements when available, otherwise a representative sample.
-Confirm what was sent and to whom.
+Resolve the campaign (as in **B.1**). Call `send_sample_email` — omit `to` to use
+the campaign's stored notification emails, or pass a comma-separated `to` override.
+It uses the campaign's real placements when available, otherwise a representative
+sample. Confirm what was sent and to whom.
 
 ## E. Edit queries
 

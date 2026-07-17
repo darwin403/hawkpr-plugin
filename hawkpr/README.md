@@ -21,7 +21,11 @@ More DPR skills will be added to this plugin over time.
 `mcp.json` / `.mcp.json` registers one server, `hawkpr`, defaulting to the
 production endpoint `https://hawkpr.vercel.app/api/mcp`. Tools: `create_campaign`,
 `list_campaigns`, `get_campaign`, `list_placements`, `set_queries`,
-`send_sample_email`, `start_hunt`.
+`set_notification_emails`, `send_sample_email`, `start_hunt`.
+
+Campaign notification emails are stored per campaign at creation time (via
+`create_campaign`) and can be updated with `set_notification_emails`. When set,
+new confirmed placements trigger automatic Resend alerts.
 
 Override the backend with `HAWKPR_MCP_URL` (e.g. `http://localhost:3000/api/mcp`
 for local development).
