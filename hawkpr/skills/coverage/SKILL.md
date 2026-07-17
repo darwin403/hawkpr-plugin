@@ -46,16 +46,15 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    user the first scan runs in the background (a few minutes) and is resumable.
    Poll `get_campaign` every ~20–30s until `hasSavedQueries` is true (the sweep
    saved its winning queries); placements usually appear by then.
-5. **Summarize visually.** Call `get_campaign` + `list_placements`, then render
-   one self-contained HTML page — a Claude Artifact (consult the `artifact-design`
-   skill) or a Cursor Canvas — with, in order:
-   1. **Tracked queries** (`searchQueries`) — labelled as what will be monitored.
-      This is the alignment check.
-   2. **Sample alert preview** — a compact rendering of the coverage-alert email
-      from the found placements (title, domain, author, link type).
+5. **Summarize in markdown.** Call `get_campaign` + `list_placements`, then render
+   a structured markdown report in chat with, in order:
+   1. **Tracked queries** (`searchQueries`) — bullet list; labelled as what will be
+      monitored. This is the alignment check.
+   2. **Sample alert preview** — a compact markdown table or list of the
+      coverage-alert fields from found placements (title, domain, author, link type).
    3. **What was found** — placement count, links vs. mentions, `lastCheckedAt`,
       and `nextCheckAt`.
-   4. A prominent **"Open campaign"** button linking to `url`.
+   4. A prominent **[Open campaign](url)** link.
 6. **Confirm & hand off.** Ask the user to confirm or edit the tracked queries
    (→ **E** if they change them). If notifications are enabled (`notificationsEnabled`),
    confirm the alert address(es) and offer a sample email to those same addresses
@@ -75,10 +74,9 @@ expensive sweep runs once; ongoing checks are cheap and scheduled.
    own cooldown, so just call it). It returns immediately; poll `get_campaign` a
    few times to see if `lastCheckedAt` advances and the count grows. If state
    doesn't advance (cooldown), just report current placements — don't force it.
-4. **Report** — `list_placements`, then summarize: new vs. the snapshot, total,
-   links vs. mentions, notable domains, and the `url`. For more than a couple of
-   new placements, render a compact HTML table (Artifact or Canvas) instead of a
-   long chat list.
+4. **Report** — `list_placements`, then summarize in markdown: new vs. the snapshot,
+   total, links vs. mentions, notable domains, and the `url`. For more than a couple
+   of new placements, use a markdown table instead of a long bullet list.
 
 ## C. List campaigns
 

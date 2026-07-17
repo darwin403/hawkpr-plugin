@@ -1,12 +1,11 @@
-# HawkPR plugin
+# HawkPR plugin (marketplace)
 
-A marketplace for **HawkPR** — a suite of digital PR tools that run inside your
-AI agent conversation, no web UI required. It ships a single plugin, `hawkpr`, a
-consolidated toolkit whose first skill is coverage tracking.
+Claude/Cursor marketplace for **HawkPR** — skills + MCP config for the hosted
+backend. Published to [darwin403/hawkpr-plugin](https://github.com/darwin403/hawkpr-plugin).
 
-Works with **Claude Code** and **Cursor**.
+**Source of truth:** this `plugin/` directory in the [hawkpr](https://github.com/darwin403/hawkpr) app repo. Edit here; publish with `./scripts/publish-plugin.sh`.
 
-## Install
+## Install (end users)
 
 ### Claude Code
 
@@ -17,31 +16,25 @@ Works with **Claude Code** and **Cursor**.
 
 ### Cursor
 
-**From GitHub (team marketplace):** Dashboard → Plugins → Add Marketplace →
-`darwin403/hawkpr-plugin`, then enable the plugin in **Customize**.
+Dashboard → Plugins → Add Marketplace → `darwin403/hawkpr-plugin`, then enable
+the plugin in **Customize**.
 
-**Local dev:**
+## Local dev
+
+From the hawkpr repo root:
 
 ```bash
-git clone https://github.com/darwin403/hawkpr-plugin.git
-ln -s "$(pwd)/hawkpr-plugin/hawkpr" ~/.cursor/plugins/local/hawkpr
+./scripts/link-plugin-local.sh
+export HAWKPR_MCP_URL=http://localhost:3000/api/mcp
+npm run dev
 ```
 
-Reload Cursor, then enable the **hawkpr** skill and MCP server in **Customize**.
+Reload Cursor/Claude, enable the **hawkpr** skill and MCP server.
 
-### Use it
+## Publish
 
-Paste a press release and ask to track its coverage, or invoke `/coverage`.
+```bash
+./scripts/publish-plugin.sh
+```
 
-## What's inside
-
-| Plugin | Skills | What it does |
-| ------ | ------ | ------------ |
-| `hawkpr` | `/coverage` | Track third-party news coverage of a pitched press release end to end. More DPR skills will be added here over time. |
-
-The plugin is metadata + skill instructions + a pointer to the hosted HawkPR MCP
-server (`https://hawkpr.vercel.app/api/mcp`). The server and app are maintained
-separately; this repo contains no application code or secrets.
-
-To point the plugin at a different backend (staging, local), set `HAWKPR_MCP_URL`
-in your environment before launching Claude or Cursor.
+Pushes `plugin/` to the public marketplace repo via `git subtree`.

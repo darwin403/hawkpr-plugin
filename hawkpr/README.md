@@ -30,6 +30,6 @@ new confirmed placements trigger automatic Resend alerts.
 Override the backend with `HAWKPR_MCP_URL` (e.g. `http://localhost:3000/api/mcp`
 for local development).
 
-The MCP server, its Supabase/Resend integration, and the eve `coverage` agent
-live in the private HawkPR app repo; this plugin repo contains no server code or
-secrets.
+The MCP server, Supabase/Resend integration, and eve `coverage` agent live in
+the parent hawkpr app repo; this directory is metadata and skill instructions
+only — no server code or secrets.
