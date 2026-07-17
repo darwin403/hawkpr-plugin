@@ -6,6 +6,6 @@
     "name": "StudioHawk",
     "email": "skdcodes@gmail.com"
   },
-  "repository": "https://github.com/darwin403/hawkpr-plugins",
+  "repository": "https://github.com/darwin403/hawkpr-plugin",
   "keywords": ["digital-pr", "coverage", "media-monitoring", "hawkpr", "studiohawk", "automation"]
 }

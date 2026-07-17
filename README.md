@@ -1,14 +1,14 @@
-# HawkPR plugins
+# HawkPR plugin
 
 A Claude Code marketplace for **HawkPR** — a suite of digital PR tools that run
-inside a Claude conversation, no web UI required. It currently ships one plugin,
+inside a Claude conversation, no web UI required. It ships a single plugin,
 `hawkpr`, a consolidated toolkit whose first skill is coverage tracking.
 
 ## Install
 
 ```
-/plugin marketplace add darwin403/hawkpr-plugins
-/plugin install hawkpr@hawkpr-plugins
+/plugin marketplace add darwin403/hawkpr-plugin
+/plugin install hawkpr@hawkpr-plugin
 ```
 
 Then use it — e.g. `/coverage`, or just paste a press release and ask to track
