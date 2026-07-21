@@ -46,6 +46,9 @@ built-in connectors like Gmail), you add it as a **custom connector** with its a
      ```
 
 4. Click **Add**. HawkPR shows **Connected** — no sign-in or password needed.
+5. Open the **HawkPR** connector and set its tools to **Always allow**, so you're not asked
+   for permission on every use. (No per-tool settings? Just click **Always allow** the first time
+   each tool runs.)
 
 That's the connector done. It's what lets Claude create campaigns and check coverage for you.
 
@@ -66,9 +69,11 @@ That's the connector done. It's what lets Claude create campaigns and check cove
 Head to **Usage** below to start using it.
 
 > **On Claude Code (CLI) or Cursor instead?** The plugin bundles the HawkPR connector for you, so
-> you can skip Step 1. In Claude Code run `/plugin marketplace add darwin403/hawkpr-plugin` then
-> `/plugin install hawkpr@hawkpr-plugin`. In Cursor, add the marketplace
-> `darwin403/hawkpr-plugin` under **Dashboard → Plugins**, then enable **hawkpr** in **Customize**.
+> you can skip Step 1. In Claude Code run `/plugin marketplace add darwin403/hawkpr-plugin`
+> then `/plugin install hawkpr@hawkpr-plugin` — and to skip the per-tool prompts, add
+> `"mcp__hawkpr"` to `permissions.allow` in your `.claude/settings.json`. In Cursor, add the
+> marketplace `darwin403/hawkpr-plugin` under **Dashboard → Plugins**, then enable **hawkpr** in
+> **Customize**.
 
 ---
 
