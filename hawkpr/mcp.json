@@ -2,7 +2,7 @@
   "mcpServers": {
     "hawkpr": {
       "type": "http",
-      "url": "${HAWKPR_MCP_URL:-https://hawkpr.vercel.app/api/mcp}"
+      "url": "https://hawkpr.vercel.app/api/mcp"
     }
   }
 }

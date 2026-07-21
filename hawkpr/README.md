@@ -20,8 +20,10 @@ More DPR skills will be added to this plugin over time.
 
 ## MCP server
 
-`mcp.json` / `.mcp.json` registers one server, `hawkpr`, defaulting to the
-production endpoint `https://hawkpr.vercel.app/api/mcp`. Tools: `create_campaign`,
+`mcp.json` / `.mcp.json` registers one server, `hawkpr`, at the literal
+production endpoint `https://hawkpr.vercel.app/api/mcp`. The URL is hardcoded (no
+`${VAR}` interpolation) because the Claude web/desktop app and the marketplace
+read it verbatim and require a plain `https://` URL. Tools: `create_campaign`,
 `list_campaigns`, `get_campaign`, `list_placements`, `set_queries`,
 `set_notification_emails`, `send_sample_email`, `start_hunt`.
 
@@ -30,8 +32,10 @@ are shown and before the status handoff, configured via `set_notification_emails
 (the plugin proposes the PR media contact with confirmation when present). When
 set, new confirmed placements trigger automatic Resend alerts.
 
-Override the backend with `HAWKPR_MCP_URL` (e.g. `http://localhost:3000/api/mcp`
-for local development).
+For local development, point at a local backend by exporting
+`HAWKPR_MCP_URL=http://localhost:3000/api/mcp` **before** running
+`scripts/link-plugin-local.sh` — it rewrites the URL in the synced Cursor copies
+only, so the committed config stays on production.
 
 The MCP server, Supabase/Resend integration, and eve `coverage` agent live in
 the parent hawkpr app repo; this directory is metadata and skill instructions
