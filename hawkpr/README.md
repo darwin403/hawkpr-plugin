@@ -7,7 +7,8 @@ HawkPR backend.
 
 ## Skills
 
-- **`/coverage`** — track third-party news coverage of a pitched press release.
+- **`/coverage`** — track third-party news coverage of a pitched press release:
+  both coverage it has already received and new pickups going forward.
   Guided onboarding (create a campaign, start the hunt, poll briefly until the
   agent saves tracked queries, show queries, offer notification emails, then hand
   off status with a shareable URL while the sweep continues in the background),

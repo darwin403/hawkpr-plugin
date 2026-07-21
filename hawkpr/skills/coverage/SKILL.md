@@ -32,64 +32,86 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
 
 ## A. Start tracking (new campaign onboarding)
 
-1. **Gather the pitch.** From the pasted press release extract `brandName`,
-   `brandDomain` (the brand's own site, e.g. `luxoliving.com.au`), and `name`
-   (a **concise campaign title** — 3–8 words, derived from the release headline
-   or dek; crisp and recognizable, not a long thematic angle). If a media contact
-   email appears in the footer or contact block (`Media contact`, `For media
-   enquiries`, `Press contact`), note it for step 5 but do not act on it yet.
-   Confirm brand, domain, and campaign name in one line. Never invent facts not in
-   the pitch. Do **not** extract or confirm a pitch date.
-2. **Create** — call `create_campaign` with `brandName`, `brandDomain`, `name`,
+1. **Gather the pitch.** From the pasted press release extract `brandName` and
+   `brandDomain` (the brand's own site, e.g. `luxoliving.com.au`). If a media
+   contact email appears in the footer or contact block (`Media contact`, `For
+   media enquiries`, `Press contact`), note it for step 7 but do not act on it
+   yet. Confirm brand and domain in one line, and add that you'll sweep for any
+   coverage the release has **already** picked up as well as watch for new pickups
+   going forward. Never invent facts not in the pitch. Do **not** extract or
+   confirm a pitch date — the sweep finds past coverage without one.
+2. **Name the campaign — always ask.** The `name` is a **crisp internal label**
+   that identifies this release at a glance, *not* the full headline or a long
+   thematic angle. Shape: **3–6 words**, the core subject of the release, no
+   colon/subtitle tails, no trailing "— …" clauses. E.g. *No safe threshold sperm
+   discovery* — not *No safe threshold: how everyday lifestyle choices impact male
+   fertility*. Derive **two** candidate labels from the headline/dek, then use
+   `AskQuestion` (not trailing prose) with prompt *"What should I call this
+   campaign? Pick one or type your own."*:
+   - Option 1 — your best recommended label (marked *(recommended)*).
+   - Option 2 — a shorter or alternative phrasing.
+   - The built-in **Other** lets the user type their own name for reference.
+
+   Use the chosen text verbatim as `name`.
+3. **Create** — call `create_campaign` with `brandName`, `brandDomain`, `name`,
    and `pressRelease` only (omit `notificationEmails`); keep `campaignId`, `slug`,
    `url`. If `existed` is true, say you're resuming rather than duplicating.
-3. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; the
+4. **Hunt** — call `start_hunt` with `campaignId`. It returns immediately; the
    agent generates tracked queries and runs the initial scan in the background.
-4. **Wait for queries only.** Poll `get_campaign` every ~10–15s until
+5. **Wait for queries only.** Poll `get_campaign` every ~10–15s until
    `searchQueries` is non-empty (or `hasSavedQueries` is true). Skip polling if
    the campaign already has queries (e.g. `existed: true`). If queries still have
-   not appeared after ~2–3 minutes, proceed to step 5 anyway (queries may still
+   not appeared after ~2–3 minutes, proceed to step 6 anyway (queries may still
    be generating).
-5. **Hand off tracked queries** (do not wait for placements or `lastSweptAt`):
+6. **Hand off tracked queries** (do not wait for placements or `lastSweptAt`):
    - Open with one line: *Tracking **{name}** for **{brandName}** (`{brandDomain}`).*
    - **Tracked queries** — bullet list from `searchQueries` (agent-generated).
      Note the sweep may refine this list when it finishes.
+   - **Google Alerts** — when `alertQueries` is non-empty, one line: *Also
+     monitoring via Google Alerts: {alertQueries, comma-separated} + brand
+     mentions of {brandName}.* Omit the line if `alertQueries` is empty.
    - Do not include Status yet. Do not label or refer to the campaign as an "angle".
-6. **Offer email alerts (optional).** Always ask unless resuming a campaign that
+7. **Offer email alerts (optional).** Always ask unless resuming a campaign that
    already has `notificationEmails` set. Use `AskQuestion` — not trailing prose —
    with prompt *"Want automatic emails when new coverage is confirmed?"*
    - **PR has media contact:** include an option to use `{email}` from the release;
      accept confirm, substitute, comma-separated addresses, or decline.
    - **No media contact:** yes/no; if yes, ask which address(es).
-   - On yes → `set_notification_emails(campaignId, emails)`. On no → leave off.
+   - On yes → `set_notification_emails(campaignId, emails)`. This also emails
+     those recipients a one-time setup confirmation listing the tracked search
+     queries + Google Alerts (observability into what's being watched); the
+     response reports `confirmationSent`/`confirmedTo`. On no → leave off.
    - If notifications already set, skip the question — one line in the status
      handoff is enough (e.g. *Alerts go to `{email}` when new coverage is confirmed.*).
-7. **Status + link** — show a status table, then a prominent **[Open campaign](url)** link:
+8. **Status + link** — show a status table, then a prominent **[Open campaign](url)** link:
 
    | | |
    |---|---|
    | **Campaign** | `{name}` |
    | **Brand** | `{brandName}` |
    | **Tracked since** | `{createdAt}` formatted |
-   | **Notifications** | Off, or comma-separated `notificationEmails` if set in step 6 |
+   | **Notifications** | Off, or comma-separated `notificationEmails` if set in step 7 |
    | **Last scan** | Relative time from `lastCheckedAt`; if null → `In progress` |
    | **Frequency** | Every 15 minutes |
 
    Never use "First scan", "Next scan", or "first scan in the background" in
    user-facing copy.
 
-8. **Close with what happens next** — one short declarative line after the link.
+9. **Close with what happens next** — one short declarative line after the link.
    No questions, no menu of optional next steps (do not ask about editing queries,
    sample emails, or on-demand checks).
 
-   - Notifications on: *New coverage will show on the dashboard and email
-     `{notificationEmails}` automatically.*
-   - Notifications off: *New coverage will show on the dashboard — checks run
-     every 15 minutes.*
+   - Notifications on: *A confirmation email listing the tracked queries and
+     Google Alerts is on its way to `{notificationEmails}`. Existing and new
+     coverage will show on the dashboard, and those addresses are emailed
+     automatically as placements are confirmed.*
+   - Notifications off: *Existing and new coverage will show on the dashboard —
+     checks run every 15 minutes.*
 
    Setup is complete; the user can bookmark the link and leave it.
 
-The expensive sweep runs once; ongoing checks run every 15 minutes.
+The expensive sweep runs once and reaches back through everything already
+published; ongoing checks run every 15 minutes.
 
 ## B. Check a campaign (on-demand)
 
@@ -126,9 +148,11 @@ save). Confirm the new set — it's what ongoing checks will monitor.
 
 ## Notes
 
-- **Campaign name:** short title from the release headline — e.g. *No safe threshold
-  sperm discovery*, not *No safe threshold — male fertility lifestyle impact*.
-  Never use "angle" in user-facing copy.
+- **Campaign name:** a crisp internal label (3–6 words) identifying the release at a
+  glance — e.g. *No safe threshold sperm discovery*, not *No safe threshold — male
+  fertility lifestyle impact* and never the full headline. Always let the user pick or
+  rename it via `AskQuestion` (step A.2) — recommend two candidates and rely on the
+  built-in **Other** for a custom name. Never use "angle" in user-facing copy.
 - Notification emails are optional. Ask via `AskQuestion` **after** showing tracked
   queries and **before** the status table. Configure with `set_notification_emails`,
   not at `create_campaign`. Propose the PR media contact when present — never silently
