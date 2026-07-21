@@ -71,16 +71,19 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
      monitoring via Google Alerts: {alertQueries, comma-separated} + brand
      mentions of {brandName}.* Omit the line if `alertQueries` is empty.
    - Do not include Status yet. Do not label or refer to the campaign as an "angle".
-7. **Offer email alerts (optional).** Always ask unless resuming a campaign that
-   already has `notificationEmails` set. Use `AskQuestion` — not trailing prose —
-   with prompt *"Want automatic emails when new coverage is confirmed?"*
-   - **PR has media contact:** include an option to use `{email}` from the release;
-     accept confirm, substitute, comma-separated addresses, or decline.
-   - **No media contact:** yes/no; if yes, ask which address(es).
-   - On yes → `set_notification_emails(campaignId, emails)`. This also emails
-     those recipients a one-time setup confirmation listing the tracked search
-     queries + Google Alerts (observability into what's being watched); the
-     response reports `confirmationSent`/`confirmedTo`. On no → leave off.
+7. **Ask which email should get alerts (not a yes/no).** Unless resuming a campaign
+   that already has `notificationEmails` set, use `AskQuestion` — not trailing prose —
+   with prompt *"Which email should get new-coverage alerts?"* and a suitable default
+   pre-filled as the recommended option:
+   - Option 1 *(recommended)* — the default address shown bare (e.g. *`{email}`*, not
+     "Yes, use …"): the PR's media contact when the release has one, otherwise the
+     current user's email if known.
+   - Option 2 — *Don't send alerts*.
+   - The built-in **Other** lets the user type one or more comma-separated addresses.
+   - On an address → `set_notification_emails(campaignId, emails)`. This also emails
+     each recipient a one-time setup confirmation listing the tracked search queries +
+     Google Alerts (observability into what's being watched); the response reports
+     `confirmationSent`/`confirmedTo`. On *Don't send alerts* → leave off.
    - If notifications already set, skip the question — one line in the status
      handoff is enough (e.g. *Alerts go to `{email}` when new coverage is confirmed.*).
 8. **Status + link** — show a status table, then a prominent **[Open campaign](url)** link:
@@ -153,11 +156,13 @@ save). Confirm the new set — it's what ongoing checks will monitor.
   fertility lifestyle impact* and never the full headline. Always let the user pick or
   rename it via `AskQuestion` (step A.2) — recommend two candidates and rely on the
   built-in **Other** for a custom name. Never use "angle" in user-facing copy.
-- Notification emails are optional. Ask via `AskQuestion` **after** showing tracked
-  queries and **before** the status table. Configure with `set_notification_emails`,
-  not at `create_campaign`. Propose the PR media contact when present — never silently
-  use a client email or default to the user's own address. Skip when resuming with
-  notifications already set.
+- Notification emails: ask **after** showing tracked queries and **before** the status
+  table, via `AskQuestion`, framed as *which address* should receive alerts (with a
+  default pre-filled) — not a yes/no. Default the recommended option to the PR media
+  contact when present, else the current user's email; the user can pick **Other** to
+  type another or *Don't send alerts* to skip. Configure with `set_notification_emails`,
+  not at `create_campaign`, and never set it silently (the question is the consent).
+  Skip when resuming with notifications already set.
 - **Scan status:** last scan from `lastCheckedAt` (relative time, or `In progress`
   when null). Frequency is always **Every 15 minutes** — hardcoded, not computed.
   Never say "First scan" or "Next scan".
