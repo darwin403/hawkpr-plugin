@@ -95,7 +95,7 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
    | **Tracked since** | `{createdAt}` formatted |
    | **Notifications** | Off, or comma-separated `notificationEmails` if set in step 7 |
    | **Last scan** | Relative time from `lastCheckedAt`; if null → `In progress` |
-   | **Frequency** | Every 15 minutes |
+   | **Frequency** | A few times a day |
 
    Never use "First scan", "Next scan", or "first scan in the background" in
    user-facing copy.
@@ -109,12 +109,12 @@ Always end by giving the campaign `url` — it's the one thing to bookmark.
      coverage will show on the dashboard, and those addresses are emailed
      automatically as placements are confirmed.*
    - Notifications off: *Existing and new coverage will show on the dashboard —
-     checks run every 15 minutes.*
+     checks run a few times a day, across the Australian news cycle.*
 
    Setup is complete; the user can bookmark the link and leave it.
 
 The expensive sweep runs once and reaches back through everything already
-published; ongoing checks run every 15 minutes.
+published; ongoing checks run a few times a day, across the Australian news cycle.
 
 ## B. Check a campaign (on-demand)
 
@@ -127,13 +127,13 @@ published; ongoing checks run every 15 minutes.
    fresh check. It returns immediately; do not poll for updated counts.
 4. **Report** — summarize the snapshot in markdown: total placements, links vs.
    mentions, notable domains, last scan (`lastCheckedAt` or `In progress`), frequency
-   (Every 15 minutes), and the `url`. Note the check runs in the background if you
+   (A few times a day), and the `url`. Note the check runs in the background if you
    just triggered one. Close declaratively — no optional-setup questions.
 
 ## C. List campaigns
 
 Call `list_campaigns` (optionally with `search`). Show brand, campaign name,
-last scan (`lastCheckedAt` or `In progress`), frequency (Every 15 minutes), and
+last scan (`lastCheckedAt` or `In progress`), frequency (A few times a day), and
 each `url`. Offer to check one (**B**) or start a new one (**A**).
 
 ## D. Sample email
@@ -164,13 +164,14 @@ save). Confirm the new set — it's what ongoing checks will monitor.
   not at `create_campaign`, and never set it silently (the question is the consent).
   Skip when resuming with notifications already set.
 - **Scan status:** last scan from `lastCheckedAt` (relative time, or `In progress`
-  when null). Frequency is always **Every 15 minutes** — hardcoded, not computed.
-  Never say "First scan" or "Next scan".
+  when null). Frequency is always **A few times a day** (checks are timed to the
+  Australian news cycle) — a fixed label, not computed. Never say "First scan" or
+  "Next scan".
 - **Handoff closing:** after onboarding or a check, state expected outcomes in one
   line — never end with questions like "Want to edit queries, send a sample email, …?"
   Optional actions (sections **D**, **E**) are only when the user asks.
 - Everything is idempotent; re-running on the same brand + campaign name resumes the
   existing campaign rather than duplicating.
-- You never need to re-run `start_hunt` for routine monitoring — checks run every
-  15 minutes automatically. Use it only for the initial sweep (**A**) or an
+- You never need to re-run `start_hunt` for routine monitoring — checks run a few
+  times a day automatically. Use it only for the initial sweep (**A**) or an
   explicit on-demand check (**B**).

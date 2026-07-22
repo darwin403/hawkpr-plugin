@@ -19,7 +19,7 @@ The plugin adds one skill to Claude, with more digital-PR tools coming over time
 
 | Skill | What it does for you |
 | --- | --- |
-| **Coverage** (`/coverage`) | Tracks third-party news coverage of a pitched press release — finds coverage already published and watches for new pickups every 15 minutes. Gives you a shareable dashboard link, and optional email alerts when new coverage lands. |
+| **Coverage** (`/coverage`) | Tracks third-party news coverage of a pitched press release — finds coverage already published and watches for new pickups a few times a day, across the Australian news cycle. Gives you a shareable dashboard link, and optional email alerts when new coverage lands. |
 
 ---
 
@@ -107,7 +107,7 @@ That's all you do. HawkPR reads the brand and website out of the release, asks y
 - A one-time question: **want email alerts when new coverage is confirmed?** If the release lists a
   media contact, it offers that address — you can accept it, use a different one, or say no.
 - A status summary and a **shareable dashboard link** to bookmark. New and existing coverage shows
-  up there, and checks keep running **every 15 minutes** in the background.
+  up there, and checks keep running **a few times a day** (across the Australian news cycle) in the background.
 
 **Good to know**
 
